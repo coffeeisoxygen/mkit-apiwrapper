@@ -20,7 +20,7 @@ wheels/
 .ruff_cache/
 
 # Version file
-src/_version.py
+app/_version.py
 
 # IDE/editor/project files
 .vscode/
