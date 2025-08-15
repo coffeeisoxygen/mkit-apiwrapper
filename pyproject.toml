@@ -100,7 +100,7 @@ lint.ignore = [
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D", "ANN"]
+"tests/*" = ["D", "ANN","T201"]
 "scripts/*" = ["D100"]
 "__init__.py" = ["D104"]
 "_version.py" = ["D", "ANN", "E", "W", "F", "I", "UP", "B"]
