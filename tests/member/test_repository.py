@@ -1,4 +1,3 @@
-# pyright: ignore[reportArgumentType]
 import pytest
 from app.domain.member.rep_member import MemberRepository
 from app.domain.member.sch_member import MemberInDB
