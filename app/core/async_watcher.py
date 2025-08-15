@@ -3,10 +3,15 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
 from app.mlogg import logger
+
+
+def _normalize_path(path: str | Path) -> Path:
+    """Helper to resolve and normalize a path for comparison."""
+    return Path(path).resolve()
 
 
 class AsyncChangeHandler(FileSystemEventHandler):
@@ -21,8 +26,12 @@ class AsyncChangeHandler(FileSystemEventHandler):
         self.debounce = debounce
         self._task: asyncio.Task | None = None
 
-    def on_modified(self, event):
-        if Path(event.src_path).resolve() == self.file_path and not event.is_directory:
+    def on_modified(self, event: FileSystemEvent):
+        src_path = event.src_path
+        if isinstance(src_path, bytes):
+            src_path = src_path.decode()
+        event_path = _normalize_path(src_path)
+        if event_path == self.file_path and not event.is_directory:
             logger.info(
                 f"📄 {self.file_path.name} changed, debouncing {self.debounce}s"
             )
