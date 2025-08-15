@@ -1,3 +1,4 @@
+# pyright: ignore[reportArgumentType]
 import pytest
 from app.domain.member.rep_member import MemberRepository
 from app.domain.member.sch_member import MemberInDB
@@ -17,10 +18,10 @@ def make_member(
     return MemberInDB(
         memberid=memberid,
         name=name,
-        pin=pin,
-        password=password,
-        ipaddress=ipaddress,
-        report_url=report_url,
+        pin=pin,  # pyright: ignore[reportArgumentType]
+        password=password,  # pyright: ignore[reportArgumentType]
+        ipaddress=ipaddress,  # pyright: ignore[reportArgumentType]
+        report_url=report_url,  # pyright: ignore[reportArgumentType]
         is_active=is_active,
         allow_nosign=allow_nosign,
     )
