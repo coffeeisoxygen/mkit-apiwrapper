@@ -5,6 +5,9 @@ from app.custom.exc_exceptions import InternalServiceError
 from app.domain.member.sch_member import MemberInDB
 from app.utils.loader.yaml_loader import YAMLDataImporter
 
+KEYNAME = "members"
+IDFIELD = "memberid"
+
 
 class MemberService:
     def __init__(self, yaml_path: Path, logger: Any):
@@ -14,7 +17,7 @@ class MemberService:
 
         # Loader setup (key_name di YAML harus "members")
         self.loader = YAMLDataImporter(
-            key_name="members", id_field="memberid", model=MemberInDB, logger=logger
+            key_name=KEYNAME, id_field=IDFIELD, model=MemberInDB, logger=logger
         )
 
     def load_members(self) -> None:
