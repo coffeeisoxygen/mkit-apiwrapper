@@ -53,5 +53,5 @@ def test_is_active(valid_yaml_path, dummy_logger):
 
 def test_missing_file(dummy_logger):
     service = MemberService(Path("tests/data/notfound.yaml"), dummy_logger)
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017
         service.load_members()
