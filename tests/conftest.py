@@ -36,3 +36,10 @@ def intercept_loguru(caplog):
     )
     yield
     logger.remove(handler_id)
+
+
+# fixture file untuk test
+@pytest.fixture(scope="session")
+def test_file_path():
+    """Fixture untuk memberikan path ke file yang akan di-load dalam test."""
+    return Path(__file__).parent / "data"
