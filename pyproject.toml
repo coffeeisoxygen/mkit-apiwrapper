@@ -10,6 +10,7 @@ dependencies = [
     "loguru-config>=0.1.0",
     "pydantic-settings>=2.10.1",
     "sqlalchemy>=2.0.43",
+    "watchdog>=6.0.0",
 ]
 
 
