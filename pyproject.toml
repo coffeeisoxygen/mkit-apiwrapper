@@ -198,7 +198,7 @@ addopts = [
     "--tb=auto",
     "--no-header",
     "--disable-warnings",
-    "--cov=src",
+    "--cov=app",
     "--cov-report=html:.reports/coverage",
     "--cov-report=term-missing:skip-covered",
     "--html=.reports/tests/report.html",
