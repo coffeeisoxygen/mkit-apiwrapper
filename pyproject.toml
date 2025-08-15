@@ -192,16 +192,19 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 pythonpath = ["app"]
 addopts = [
+    "--import-mode=importlib",
     "-v",
     "--strict-markers",
-    "--tb=short",
+    "--tb=auto",
     "--no-header",
     "--disable-warnings",
-    "--cov=app",
+    "--cov=src",
     "--cov-report=html:.reports/coverage",
     "--cov-report=term-missing:skip-covered",
     "--html=.reports/tests/report.html",
     "--self-contained-html",
+    "--capture=no",
+    "--color=yes",
 ]
 asyncio_mode = "auto"
 

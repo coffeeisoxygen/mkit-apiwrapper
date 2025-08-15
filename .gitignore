@@ -63,3 +63,6 @@ user_info.json
 
 # environment-specific files
 .env.test
+
+# Test Generated Report
+.hypothesis/
