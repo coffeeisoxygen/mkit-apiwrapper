@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     app_name: str = "MKIT_WRAPPER"
     app_version: str = version
     db_path: str
+    data_path: str
 
 
 @lru_cache
