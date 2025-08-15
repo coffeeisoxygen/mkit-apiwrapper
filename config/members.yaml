@@ -18,3 +18,4 @@ members:
     report_url: http://192.168.1.2:8080/report
     is_active: true
     allow_nosign: true
+weggw

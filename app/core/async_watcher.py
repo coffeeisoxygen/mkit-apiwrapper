@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Callable
+from concurrent.futures import Future  # <-- add this import
 from pathlib import Path
 from typing import Any
 
@@ -18,13 +19,18 @@ class AsyncChangeHandler(FileSystemEventHandler):
     """Handler yang trigger callback async dengan debounce."""
 
     def __init__(
-        self, file_path: Path, callback: Callable[[], Any], debounce: float = 1.0
+        self,
+        file_path: Path,
+        callback: Callable[[], Any],
+        debounce: float = 1.0,
+        loop: asyncio.AbstractEventLoop | None = None,
     ):
         super().__init__()
         self.file_path = file_path.resolve()
         self.callback = callback
         self.debounce = debounce
-        self._task: asyncio.Task | None = None
+        self._task: Future[Any] | None = None  # <-- update type annotation
+        self._loop = loop or asyncio.get_event_loop()
 
     def on_modified(self, event: FileSystemEvent):
         src_path = event.src_path
@@ -37,7 +43,10 @@ class AsyncChangeHandler(FileSystemEventHandler):
             )
             if self._task and not self._task.done():
                 self._task.cancel()
-            self._task = asyncio.create_task(self._debounced_callback())
+            # Use run_coroutine_threadsafe to schedule coroutine from thread
+            self._task = asyncio.run_coroutine_threadsafe(
+                self._debounced_callback(), self._loop
+            )
 
     async def _debounced_callback(self):
         try:
@@ -58,11 +67,17 @@ class AsyncFileWatcher:
     def __init__(self):
         self._observer = Observer()
         self._handlers: list[AsyncChangeHandler] = []
+        self._loop: asyncio.AbstractEventLoop | None = None
 
     def add_watch(
         self, file_path: Path, callback: Callable[[], Any], debounce: float = 1.0
     ):
-        handler = AsyncChangeHandler(file_path, callback, debounce)
+        if self._loop is None:
+            try:
+                self._loop = asyncio.get_running_loop()
+            except RuntimeError:
+                self._loop = asyncio.get_event_loop()
+        handler = AsyncChangeHandler(file_path, callback, debounce, loop=self._loop)
         self._observer.schedule(handler, str(file_path.parent), recursive=False)
         self._handlers.append(handler)
         logger.info(f"👀 Watching {file_path.name} async")
