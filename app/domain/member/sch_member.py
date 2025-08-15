@@ -13,6 +13,14 @@ from pydantic import (
 
 
 class MemberInDB(BaseModel):
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, MemberInDB):
+            return self.memberid == other.memberid
+        return False
+
+    def __hash__(self):
+        return hash(self.memberid)
+
     """deskripsi Data Member Pada Data."""
 
     model_config = ConfigDict(

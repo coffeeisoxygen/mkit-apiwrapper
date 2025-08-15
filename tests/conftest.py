@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+import yaml
 from app.config import get_settings
 from app.mlogg import logger
 from dotenv import load_dotenv
@@ -43,3 +44,12 @@ def intercept_loguru(caplog):
 def test_file_path():
     """Fixture untuk memberikan path ke file yang akan di-load dalam test."""
     return Path(__file__).parent / "data"
+
+
+@pytest.fixture(scope="session")
+def valid_members_data(test_file_path):
+    """Fixture untuk memuat data member valid dari YAML."""
+    yaml_path = test_file_path / "members_valid.yaml"
+    with open(yaml_path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return data["members"]
