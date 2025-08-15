@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.config import get_settings, version
+from app.config.cfg_lifespan import app_lifespan
 
 # import settings
 settings = get_settings()
@@ -10,6 +11,7 @@ app: FastAPI = FastAPI(
     title="mkit-apiwrapper",
     description="project untuk hanlde dan wrapper response dari Module Module API otoplus",
     version=version,
+    lifespan=app_lifespan,
 )
 
 

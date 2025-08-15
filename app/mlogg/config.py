@@ -6,7 +6,7 @@ from pathlib import Path
 from loguru import logger
 from loguru_config import LoguruConfig
 
-CONFIG_PATH = Path(__file__).parent.parent.parent / "loguru.yaml"
+CONFIG_PATH = Path(__file__).parent.parent.parent / "logging.yaml"
 
 UVICORN_LOGGERS = (
     "uvicorn",
