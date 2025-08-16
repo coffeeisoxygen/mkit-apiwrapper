@@ -1,3 +1,4 @@
+# pyright: reportUndefinedVariable=false, reportGeneralTypeIssues=false, reportArgumentType=false
 import pytest
 from app.core.datamanager import BaseDataManager, MemberDataManager, ModuleDataManager
 
@@ -89,7 +90,7 @@ def test_add_none_key():
     mgr = BaseDataManager()
     mgr.clear_data()
     with pytest.raises(TypeError):
-        mgr.add_item(None, "value")  # pyright: ignore[reportArgumentType]
+        mgr.add_item(None, "value")
 
 
 def test_add_empty_string_key():
@@ -124,7 +125,7 @@ def test_add_item_with_non_string_key():
     mgr = BaseDataManager()
     mgr.clear_data()
     with pytest.raises(TypeError):
-        mgr.add_item(123, "numberkey")  # type: ignore
+        mgr.add_item(123, "numberkey")
 
 
 def test_get_item_with_non_string_key():
@@ -132,7 +133,7 @@ def test_get_item_with_non_string_key():
     mgr.clear_data()
     mgr.upload_data({"foo": "bar"})
     with pytest.raises(TypeError):
-        mgr.get_item(123)  # type: ignore
+        mgr.get_item(123)
 
 
 def test_remove_item_with_non_string_key():
