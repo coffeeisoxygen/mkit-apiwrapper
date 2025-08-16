@@ -120,13 +120,6 @@ class BaseDataManager:
             raise DataManagerExcpError(f"Failed to remove item: {key}") from e
 
 
-# subclass
-class MemberDataManager(BaseDataManager):
-    """Data manager for member-related data."""
-
-    pass
-
-
 class ModuleDataManager(BaseDataManager):
     """Data manager for module-related data."""
 

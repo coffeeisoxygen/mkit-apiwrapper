@@ -8,8 +8,10 @@ MemberDataManager, and ModuleDataManager.
 
 # pyright: reportUndefinedVariable=false, reportGeneralTypeIssues=false, reportArgumentType=false
 import pytest
-from app.core.datamanager import BaseDataManager, MemberDataManager, ModuleDataManager
+from app.core import BaseDataManager
 from app.custom.exc_exceptions import DataManagerExcpError
+from app.domain.member.dta_member import MemberDataManager
+from app.domain.module.dta_module import ModuleDataManager
 
 
 def test_singleton_behavior():

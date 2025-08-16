@@ -1,4 +1,4 @@
-from app.core.datamanager import MemberDataManager
+from app.domain.member.dta_member import MemberDataManager
 from app.domain.member.sch_member import MemberInDB
 
 
