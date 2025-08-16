@@ -92,7 +92,7 @@ class ModuleInDB(BaseModel):
 
     @field_validator("provider", mode="before")
     @classmethod
-    def validate_provider_enum(cls, v):
+    def validate_provider_enum(cls, v):  # noqa: ANN001, ANN206
         if isinstance(v, str):
             v = v.upper()
         return v
