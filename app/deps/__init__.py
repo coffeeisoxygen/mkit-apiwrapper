@@ -4,8 +4,11 @@ from typing import Annotated
 
 from fastapi import Depends, Request
 
+from app.config import get_settings
 from app.core.orchestrator import ModuleService
 from app.domain.member.srv_member import MemberService
+
+settings = get_settings()
 
 
 def get_member_service(request: Request) -> MemberService:
@@ -20,3 +23,10 @@ def get_module_service(request: Request) -> ModuleService:
 
 
 DepModuleService = Annotated[ModuleService, Depends(get_module_service)]
+
+
+def get_app_settings(request: Request):
+    return {"settings": settings.model_dump()}
+
+
+DepAppSettings = Annotated[dict, Depends(get_app_settings)]

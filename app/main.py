@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from api.cfg_router import register_routers
+from app.api.cfg_router import register_routers
 from app.config import get_settings, version
 from app.config.cfg_lifespan import app_lifespan
 from app.custom.exc_exceptions import AppExceptionError

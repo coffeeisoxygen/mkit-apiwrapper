@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.deps import DepMemberService, DepModuleService
+from app.deps import DepAppSettings, DepMemberService, DepModuleService
 
 router = APIRouter()
 
@@ -15,3 +15,8 @@ def debug_members(member_service: DepMemberService):
 @router.get("/debug/modules", tags=["Debug"])
 def debug_modules(module_service: DepModuleService):
     return {"modules": [m.model_dump() for m in module_service.get_all()]}
+
+
+@router.get("/debug/settings", tags=["Debug"])
+def debug_settings(app_settings: DepAppSettings):
+    return app_settings
