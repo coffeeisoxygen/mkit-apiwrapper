@@ -1,7 +1,6 @@
 # app/core/svc_base.py
 from typing import Any, TypeVar
 
-from app.custom.exc_exceptions import ServiceExcpError
 from app.mlogg import logger
 
 T = TypeVar("T")  # entity type
@@ -21,9 +20,9 @@ class BaseService[T]:
         try:
             self._repo.add(key, entity)
             log.info("Entity ditambahkan lewat service")
-        except Exception as e:
+        except Exception:
             log.exception("Service gagal add entity")
-            raise ServiceExcpError(f"{self.service_name} gagal add") from e
+            # No raise
 
     def get(self, key: str) -> T | None:
         log = self._log.bind(operation="get", key=key)
@@ -33,9 +32,9 @@ class BaseService[T]:
                 log.warning("Entity tidak ditemukan via service")
             else:
                 log.info("Entity ditemukan via service")
-        except Exception as e:
+        except Exception:
             log.exception("Service gagal get entity")
-            raise ServiceExcpError(f"{self.service_name} gagal get") from e
+            return None
         else:
             return entity
 
@@ -44,17 +43,17 @@ class BaseService[T]:
         try:
             self._repo.delete(key)
             log.info("Entity dihapus via service")
-        except Exception as e:
+        except Exception:
             log.exception("Service gagal delete")
-            raise ServiceExcpError(f"{self.service_name} gagal delete") from e
+            # No raise
 
     def list_all(self) -> list[T]:
         log = self._log.bind(operation="list_all")
         try:
             entities = self._repo.get_all()
             log.info(f"Total entities: {len(entities)} via service")
-        except Exception as e:
+        except Exception:
             log.exception("Service gagal list_all")
-            raise ServiceExcpError(f"{self.service_name} gagal list_all") from e
+            return []
         else:
             return entities
