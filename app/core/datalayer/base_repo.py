@@ -1,13 +1,12 @@
 from typing import Any, TypeVar
 
-from app.custom.exc_exceptions import RepositoryExcpError
 from app.mlogg import logger
 
 T = TypeVar("T")  # entity type
 
 
 class BaseRepository[T]:
-    """Base repository dengan fail-fast, contextual logging, dan RepositoryExcpError."""
+    """Base repository dengan fail-safe, contextual logging, dan RepositoryExcpError."""
 
     repo_name: str = "BaseRepository"
 
@@ -20,19 +19,19 @@ class BaseRepository[T]:
         try:
             self._datamanager.add_item(key, entity)
             log.info("Entity ditambahkan")
-        except Exception as e:
+        except Exception:
             log.exception("Gagal add entity")
-            raise RepositoryExcpError(f"{self.repo_name} gagal add") from e
+            # No raise
 
     def add_bulk(self, items: dict[str, T]):
         log = self._log.bind(operation="add_bulk", count=len(items))
         try:
             for key, entity in items.items():
-                self.add(key, entity)  # fail-fast per item
+                self.add(key, entity)  # fail-safe per item
             log.info("Bulk entities ditambahkan")
-        except Exception as e:
+        except Exception:
             log.exception("Gagal add bulk")
-            raise RepositoryExcpError(f"{self.repo_name} gagal add_bulk") from e
+            # No raise
 
     def get(self, key: str) -> T | None:
         log = self._log.bind(operation="get", key=key)
@@ -42,9 +41,10 @@ class BaseRepository[T]:
                 log.warning("Entity tidak ditemukan")
             else:
                 log.info("Entity ditemukan")
-        except Exception as e:
+        except Exception:
             log.exception("Gagal get entity")
-            raise RepositoryExcpError(f"{self.repo_name} gagal get") from e
+            # No raise
+            return None
         else:
             return entity
 
@@ -53,9 +53,10 @@ class BaseRepository[T]:
         try:
             entities = list(self._datamanager.get_data().values())
             log.info(f"Total entities: {len(entities)}")
-        except Exception as e:
+        except Exception:
             log.exception("Gagal get_all")
-            raise RepositoryExcpError(f"{self.repo_name} gagal get_all") from e
+            # No raise
+            return []
         else:
             return entities
 
@@ -64,18 +65,19 @@ class BaseRepository[T]:
         try:
             self._datamanager.remove_item(key)
             log.info("Entity dihapus")
-        except Exception as e:
+        except Exception:
             log.exception("Gagal delete")
-            raise RepositoryExcpError(f"{self.repo_name} gagal delete") from e
+            # No raise
 
     def exists(self, key: str) -> bool:
         log = self._log.bind(operation="exists", key=key)
         try:
             exists = key in self._datamanager.get_data()
             log.info(f"Exists: {exists}")
-        except Exception as e:
+        except Exception:
             log.exception("Gagal cek exists")
-            raise RepositoryExcpError(f"{self.repo_name} gagal exists") from e
+            # No raise
+            return False
         else:
             return exists
 
@@ -84,9 +86,10 @@ class BaseRepository[T]:
         try:
             count = len(self._datamanager.get_data())
             log.info(f"Jumlah entities: {count}")
-        except Exception as e:
+        except Exception:
             log.exception("Gagal count")
-            raise RepositoryExcpError(f"{self.repo_name} gagal count") from e
+            # No raise
+            return 0
         else:
             return count
 
@@ -95,6 +98,6 @@ class BaseRepository[T]:
         try:
             self._datamanager.clear_data()
             log.info("Semua entities dihapus")
-        except Exception as e:
+        except Exception:
             log.exception("Gagal clear")
-            raise RepositoryExcpError(f"{self.repo_name} gagal clear") from e
+            # No raise
