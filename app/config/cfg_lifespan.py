@@ -11,17 +11,15 @@ async def app_lifespan(app):  # noqa: ANN001, D103
     logger.bind(operation="app_lifespan").info("Starting application")
 
     # 2. Init orchestrator & services
-    orch = AppOrchestrator(logger)
-    orch.init_services()
-    orch.setup_watchers()
-
+    orchestrator = AppOrchestrator()
+    orchestrator.init_services()
+    orchestrator.setup_watchers()
+    await orchestrator.start_watchers()
     # 3. Simpan orchestrator di state
-    app.state.orchestrator = orch
+    app.state.orchestrator = orchestrator
 
-    # 4. Start/stop orchestrator (watchers)
-    await orch.start()
     try:
         yield
     finally:
-        await orch.stop()
+        await orchestrator.stop_watchers()
         logger.bind(operation="app_lifespan").info("Shutting down application")

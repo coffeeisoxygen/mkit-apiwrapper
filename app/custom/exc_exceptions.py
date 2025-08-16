@@ -76,3 +76,10 @@ class ServiceExcpError(AppExceptionError):
 
     default_message: str = "Ada Error Di Proses Service"
     status_code: int = 500
+
+
+class UploaderExcpError(AppExceptionError):
+    """Exception raised for uploader errors."""
+
+    default_message: str = "Ada Error Di Proses Uploader"
+    status_code: int = 500

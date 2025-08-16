@@ -4,6 +4,8 @@ handlers:
     format: "|<level>{level: <8}</level>| <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level> {extra}"
     enqueue: true
     colorize: true
+    diagnose: true
+    backtrace: true
 
   # - sink: logs/application.log
   #   level: INFO
