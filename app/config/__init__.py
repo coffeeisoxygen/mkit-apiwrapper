@@ -1,5 +1,6 @@
 """project environments configurations."""
 
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from app._version import version
@@ -17,6 +18,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 DEFAULT_ENV_FILE = BASE_DIR / ".env"
 
 
+class EnvironmentEnums(StrEnum):
+    PRODUCTION = "PRODUCTION"
+    DEVELOPMENT = "DEVELOPMENT"
+    TESTING = "TESTING"
+
+
+class ProviderEnums(StrEnum):
+    DIGIPOS = "DIGIPOS"
+    ISIMPLE = "ISIMPLE"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=DEFAULT_ENV_FILE,
@@ -25,7 +37,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    app_env: str = "PRODUCTION"
+    app_env: EnvironmentEnums = EnvironmentEnums.PRODUCTION
     app_debug: bool = False
     app_name: str = "MKIT_WRAPPER"
     app_version: str = version
