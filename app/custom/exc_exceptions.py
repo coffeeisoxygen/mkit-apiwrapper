@@ -54,3 +54,11 @@ class ConfigExcpError(AppExceptionError):
 
     default_message: str = "Ada Error Di Proses Config"
     status_code = 500
+
+
+# new exceptions dari sini , kita buat per layer agar mudah utntuk tracking
+class DataManagerExcpError(AppExceptionError):
+    """Exception raised for data manager errors."""
+
+    default_message: str = "Ada Error Di Proses Data Manager"
+    status_code: int = 500

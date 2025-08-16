@@ -1,9 +1,19 @@
+"""
+Unit tests for the DataManager classes in app.core.datamanager.
+
+These tests cover singleton behavior, data upload/retrieval, item addition/removal,
+subclass independence, error handling, and edge cases for BaseDataManager,
+MemberDataManager, and ModuleDataManager.
+"""
+
 # pyright: reportUndefinedVariable=false, reportGeneralTypeIssues=false, reportArgumentType=false
 import pytest
 from app.core.datamanager import BaseDataManager, MemberDataManager, ModuleDataManager
+from app.custom.exc_exceptions import DataManagerExcpError
 
 
 def test_singleton_behavior():
+    """Test that MemberDataManager and ModuleDataManager implement singleton behavior."""
     a = MemberDataManager()
     b = MemberDataManager()
     c = ModuleDataManager()
@@ -14,6 +24,7 @@ def test_singleton_behavior():
 
 
 def test_upload_and_get_data():
+    """Test uploading data and retrieving a copy from BaseDataManager."""
     mgr = BaseDataManager()
     mgr.clear_data()
     data = {"x": 1, "y": 2}
@@ -26,6 +37,7 @@ def test_upload_and_get_data():
 
 
 def test_clear_data():
+    """Test clearing all data from BaseDataManager."""
     mgr = BaseDataManager()
     mgr.upload_data({"a": 10})
     mgr.clear_data()
@@ -33,6 +45,7 @@ def test_clear_data():
 
 
 def test_get_item():
+    """Test retrieving an item by key from BaseDataManager."""
     mgr = BaseDataManager()
     mgr.clear_data()
     mgr.upload_data({"foo": "bar"})
@@ -41,15 +54,17 @@ def test_get_item():
 
 
 def test_add_item_and_duplicate_key():
+    """Test adding an item and handling duplicate keys in BaseDataManager."""
     mgr = BaseDataManager()
     mgr.clear_data()
     mgr.add_item("key1", "val1")
     assert mgr.get_item("key1") == "val1"
-    with pytest.raises(ValueError):
+    with pytest.raises(DataManagerExcpError):
         mgr.add_item("key1", "val2")
 
 
 def test_remove_item():
+    """Test removing an item by key from BaseDataManager."""
     mgr = BaseDataManager()
     mgr.clear_data()
     mgr.upload_data({"a": 1, "b": 2})
@@ -60,6 +75,7 @@ def test_remove_item():
 
 
 def test_subclass_independence():
+    """Test that MemberDataManager and ModuleDataManager maintain independent data."""
     member_mgr = MemberDataManager()
     module_mgr = ModuleDataManager()
     member_mgr.clear_data()
@@ -73,6 +89,7 @@ def test_subclass_independence():
 
 
 def test_upload_empty_data():
+    """Test uploading empty data to BaseDataManager."""
     mgr = BaseDataManager()
     mgr.clear_data()
     mgr.upload_data({})
@@ -80,6 +97,7 @@ def test_upload_empty_data():
 
 
 def test_remove_item_from_empty():
+    """Test removing an item from an empty BaseDataManager."""
     mgr = BaseDataManager()
     mgr.clear_data()
     mgr.remove_item("nonexistent")
@@ -87,13 +105,15 @@ def test_remove_item_from_empty():
 
 
 def test_add_none_key():
+    """Test that adding an item with None as key raises an error."""
     mgr = BaseDataManager()
     mgr.clear_data()
-    with pytest.raises(TypeError):
+    with pytest.raises(DataManagerExcpError):
         mgr.add_item(None, "value")
 
 
 def test_add_empty_string_key():
+    """Test adding and removing an item with an empty string key."""
     mgr = BaseDataManager()
     mgr.clear_data()
     mgr.add_item("", "empty")
@@ -103,6 +123,7 @@ def test_add_empty_string_key():
 
 
 def test_large_data_upload():
+    """Test uploading a large dataset to BaseDataManager."""
     mgr = BaseDataManager()
     mgr.clear_data()
     large_data = {str(i): i for i in range(1000)}
@@ -112,6 +133,7 @@ def test_large_data_upload():
 
 
 def test_remove_all_items_one_by_one():
+    """Test removing all items from BaseDataManager one by one."""
     mgr = BaseDataManager()
     mgr.clear_data()
     data = {"a": 1, "b": 2, "c": 3}
@@ -122,22 +144,25 @@ def test_remove_all_items_one_by_one():
 
 
 def test_add_item_with_non_string_key():
+    """Test that adding an item with a non-string key raises an error."""
     mgr = BaseDataManager()
     mgr.clear_data()
-    with pytest.raises(TypeError):
+    with pytest.raises(DataManagerExcpError):
         mgr.add_item(123, "numberkey")
 
 
 def test_get_item_with_non_string_key():
+    """Test that getting an item with a non-string key raises an error."""
     mgr = BaseDataManager()
     mgr.clear_data()
     mgr.upload_data({"foo": "bar"})
-    with pytest.raises(TypeError):
+    with pytest.raises(DataManagerExcpError):
         mgr.get_item(123)
 
 
 def test_remove_item_with_non_string_key():
+    """Test that removing an item with a non-string key raises an error."""
     mgr = BaseDataManager()
     mgr.clear_data()
-    with pytest.raises(TypeError):
+    with pytest.raises(DataManagerExcpError):
         mgr.remove_item(123)
