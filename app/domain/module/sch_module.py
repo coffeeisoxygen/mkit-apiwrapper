@@ -89,3 +89,10 @@ class ModuleInDB(BaseModel):
         if isinstance(v, int):
             return str(v)
         return v
+
+    @field_validator("provider", mode="before")
+    @classmethod
+    def validate_provider_enum(cls, v):
+        if isinstance(v, str):
+            v = v.upper()
+        return v
