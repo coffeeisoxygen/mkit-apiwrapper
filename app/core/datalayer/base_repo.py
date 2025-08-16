@@ -9,7 +9,7 @@ T = TypeVar("T")  # entity type
 class BaseRepository[T]:
     """Base repository dengan fail-fast, contextual logging, dan RepositoryExcpError."""
 
-    repo_name: str = "BaseRepository"  # override di subclass
+    repo_name: str = "BaseRepository"
 
     def __init__(self, datamanager: Any):
         self._datamanager = datamanager
