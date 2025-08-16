@@ -3,10 +3,12 @@ from typing import Any
 
 from app.config import get_settings
 from app.core.async_watcher import AsyncFileWatcher
-from app.domain.member.srv_member import MemberService
-from app.domain.module.srv_module import ModuleService
+from app.domain.member.rep_member import MemberRepository
+from app.domain.member.sch_member import MemberInDB
+from app.domain.module.rep_module import ModuleRepository
+from app.domain.module.sch_module import ModuleInDB
 from app.mlogg import logger
-from app.services.uploader import MemberUploader, ModuleUploader
+from app.services.srv_data_uploader import DataUploader
 
 PATHMEMBER = Path(get_settings().config_path) / "members.yaml"
 PATHMODULE = Path(get_settings().config_path) / "modules.yaml"
@@ -17,16 +19,28 @@ class AppOrchestrator:
 
     def __init__(self, logger: Any = logger):
         self.logger = logger
-        self.member_service: MemberService = MemberService()
-        self.module_service: ModuleService = ModuleService()
+        self.member_repo = MemberRepository()
+        self.module_repo = ModuleRepository()
+        self.member_uploader = DataUploader(
+            repo=self.member_repo,
+            schema=MemberInDB,
+            key_field="memberid",
+            data_field="members",
+        )
+        self.module_uploader = DataUploader(
+            repo=self.module_repo,
+            schema=ModuleInDB,
+            key_field="moduleid",
+            data_field="modules",
+        )
         self.watcher: AsyncFileWatcher = AsyncFileWatcher()
 
     async def init_services(self):
         """Clear repos & seed initial data async (fail-safe)."""
         # Step 1: Clear repos
         try:
-            self.member_service._repo.clear()
-            self.module_service._repo.clear()
+            self.member_repo.clear()
+            self.module_repo.clear()
             self.logger.info("✅ Repos cleared")
         except Exception as e:
             self.logger.exception("❌ Failed to clear repos")
@@ -34,8 +48,8 @@ class AppOrchestrator:
 
         # Step 2: Seed data awal (fail-safe)
         try:
-            await MemberUploader(self.member_service).upload_from_yaml(PATHMEMBER)
-            await ModuleUploader(self.module_service).upload_from_yaml(PATHMODULE)
+            await self.member_uploader.upload_from_yaml(PATHMEMBER)
+            await self.module_uploader.upload_from_yaml(PATHMODULE)
             self.logger.info("✅ Initial data seeded for Member & Module")
         except Exception as e:
             self.logger.error(f"❌ Failed to seed initial data: {e}")
@@ -46,14 +60,14 @@ class AppOrchestrator:
 
         async def reload_members():
             try:
-                await MemberUploader(self.member_service).upload_from_yaml(PATHMEMBER)
+                await self.member_uploader.upload_from_yaml(PATHMEMBER)
                 self.logger.info("♻ Members reloaded via watcher")
             except Exception as e:
                 self.logger.error(f"❌ Watcher failed reload members: {e}")
 
         async def reload_modules():
             try:
-                await ModuleUploader(self.module_service).upload_from_yaml(PATHMODULE)
+                await self.module_uploader.upload_from_yaml(PATHMODULE)
                 self.logger.info("♻ Modules reloaded via watcher")
             except Exception as e:
                 self.logger.error(f"❌ Watcher failed reload modules: {e}")
@@ -73,8 +87,8 @@ class AppOrchestrator:
         self.logger.info("🛑 Async watchers stopped")
 
     # Getter untuk domain service
-    def get_member_service(self) -> MemberService:
-        return self.member_service
+    def get_member_repo(self) -> MemberRepository:
+        return self.member_repo
 
-    def get_module_service(self) -> ModuleService:
-        return self.module_service
+    def get_module_repo(self) -> ModuleRepository:
+        return self.module_repo
