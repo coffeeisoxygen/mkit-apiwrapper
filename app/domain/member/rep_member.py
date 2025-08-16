@@ -6,17 +6,23 @@ class MemberRepository:
     def __init__(self):
         self._datamanager = MemberDataManager()
 
-    def load(self, members: list[MemberInDB]):
-        # Simpan ke datamanager
-        self._datamanager.upload_data({m.memberid: m for m in members})
+    def add_member(self, member: MemberInDB):
+        self._datamanager.add_item(member.memberid, member)
 
-    def get(self, memberid: str) -> MemberInDB | None:
+    def add_bulk_members(self, members: list[MemberInDB]):
+        for member in members:
+            self.add_member(member)
+
+    def delete_member(self, memberid: str):
+        self._datamanager.remove_item(memberid)
+
+    def get_member(self, memberid: str) -> MemberInDB | None:
         return self._datamanager.get_item(memberid)
 
-    def all(self) -> list[MemberInDB]:
+    def get_all_members(self) -> list[MemberInDB]:
         return list(self._datamanager.get_data().values())
 
-    def count(self) -> int:
+    def count_members(self) -> int:
         return len(self._datamanager.get_data())
 
     def exists(self, memberid: str) -> bool:

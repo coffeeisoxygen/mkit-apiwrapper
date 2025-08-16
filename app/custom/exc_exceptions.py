@@ -62,3 +62,10 @@ class DataManagerExcpError(AppExceptionError):
 
     default_message: str = "Ada Error Di Proses Data Manager"
     status_code: int = 500
+
+
+class RepositoryExcpError(AppExceptionError):
+    """Exception raised for repository errors."""
+
+    default_message: str = "Ada Error Di Proses Repository"
+    status_code: int = 500
