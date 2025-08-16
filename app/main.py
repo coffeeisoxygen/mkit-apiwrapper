@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from api.cfg_router import register_routers
 from app.config import get_settings, version
 from app.config.cfg_lifespan import app_lifespan
 from app.custom.exc_exceptions import AppExceptionError
@@ -26,6 +27,9 @@ async def app_exception_handler(request: Request, exc: AppExceptionError):  # no
         status_code=exc.status_code,
         content={"error": exc.message, "context": exc.context},
     )
+
+
+register_routers(app)
 
 
 # just main root

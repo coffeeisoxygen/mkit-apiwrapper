@@ -2,14 +2,16 @@
 
 from fastapi import APIRouter
 
+from app.deps import DepMemberService, DepModuleService
+
 router = APIRouter()
 
 
-@router.get("/health")
-def health_check():
-    return {"status": "healthy"}
+@router.get("/debug/members", tags=["Debug"])
+def debug_members(member_service: DepMemberService):
+    return {"members": [m.model_dump() for m in member_service.get_all()]}
 
 
-@router.get("/data/{item_id}")
-def read_data(item_id: int):
-    return {"item_id": item_id}
+@router.get("/debug/modules", tags=["Debug"])
+def debug_modules(module_service: DepModuleService):
+    return {"modules": [m.model_dump() for m in module_service.get_all()]}
