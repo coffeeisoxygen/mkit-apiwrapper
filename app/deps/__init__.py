@@ -5,24 +5,10 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from app.config import get_settings
-from app.core.orchestrator import ModuleService
-from app.domain.member.srv_member import MemberService
+from app.domain.member.rep_member import MemberRepository
+from app.domain.module.rep_module import ModuleRepository
 
 settings = get_settings()
-
-
-def get_member_service(request: Request) -> MemberService:
-    return request.app.state.orchestrator.get_member_service()
-
-
-DepMemberService = Annotated[MemberService, Depends(get_member_service)]
-
-
-def get_module_service(request: Request) -> ModuleService:
-    return request.app.state.orchestrator.get_module_service()
-
-
-DepModuleService = Annotated[ModuleService, Depends(get_module_service)]
 
 
 def get_app_settings(request: Request):
@@ -30,3 +16,17 @@ def get_app_settings(request: Request):
 
 
 DepAppSettings = Annotated[dict, Depends(get_app_settings)]
+
+
+def get_member_repo(request: Request) -> MemberRepository:
+    return request.app.state.orchestrator.get_member_repo()
+
+
+DepMemberRepo = Annotated[MemberRepository, Depends(get_member_repo)]
+
+
+def get_module_repo(request: Request) -> ModuleRepository:
+    return request.app.state.orchestrator.get_module_repo()
+
+
+DepModuleRepo = Annotated[ModuleRepository, Depends(get_module_repo)]

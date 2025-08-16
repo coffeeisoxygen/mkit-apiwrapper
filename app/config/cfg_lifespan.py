@@ -10,9 +10,9 @@ async def app_lifespan(app):  # noqa: ANN001, D103
     init_logging()
     logger.bind(operation="app_lifespan").info("Starting application")
 
-    # 2. Init orchestrator & services
+    # 2. Init orchestrator & seed data
     orchestrator = AppOrchestrator()
-    await orchestrator.init_services()
+    await orchestrator.seed_initial_data()
     orchestrator.setup_watchers()
     await orchestrator.start_watchers()
     # 3. Simpan orchestrator di state
