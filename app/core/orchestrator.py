@@ -22,36 +22,45 @@ class AppOrchestrator:
         self.watcher: AsyncFileWatcher = AsyncFileWatcher()
 
     async def init_services(self):
-        """Clear repos & seed initial data async."""
+        """Clear repos & seed initial data async (fail-safe)."""
+        # Step 1: Clear repos
         try:
             self.member_service._repo.clear()
             self.module_service._repo.clear()
             self.logger.info("✅ Repos cleared")
+        except Exception as e:
+            self.logger.exception("❌ Failed to clear repos")
+            raise RuntimeError(f"Failed to clear repos: {e}") from e
 
-            # Initial seeding async
+        # Step 2: Seed data awal (fail-safe)
+        try:
             await MemberUploader(self.member_service).upload_from_yaml(PATHMEMBER)
             await ModuleUploader(self.module_service).upload_from_yaml(PATHMODULE)
             self.logger.info("✅ Initial data seeded for Member & Module")
         except Exception as e:
-            self.logger.exception("❌ Failed to initialize services")
-            raise RuntimeError(f"Failed to initialize services: {e}") from e
+            self.logger.error(f"❌ Failed to seed initial data: {e}")
+            # tetap lanjut meskipun ada error
 
     def setup_watchers(self):
         """Register watcher untuk auto reload setiap YAML perubahan."""
-        try:
 
-            async def reload_members():
+        async def reload_members():
+            try:
                 await MemberUploader(self.member_service).upload_from_yaml(PATHMEMBER)
+                self.logger.info("♻ Members reloaded via watcher")
+            except Exception as e:
+                self.logger.error(f"❌ Watcher failed reload members: {e}")
 
-            async def reload_modules():
+        async def reload_modules():
+            try:
                 await ModuleUploader(self.module_service).upload_from_yaml(PATHMODULE)
+                self.logger.info("♻ Modules reloaded via watcher")
+            except Exception as e:
+                self.logger.error(f"❌ Watcher failed reload modules: {e}")
 
-            self.watcher.add_watch(PATHMEMBER, reload_members)
-            self.watcher.add_watch(PATHMODULE, reload_modules)
-            self.logger.info("👀 Watchers registered for YAML configs")
-        except Exception as e:
-            self.logger.exception("❌ Failed to setup watchers")
-            raise RuntimeError(f"Failed to setup watchers: {e}") from e
+        self.watcher.add_watch(PATHMEMBER, reload_members)
+        self.watcher.add_watch(PATHMODULE, reload_modules)
+        self.logger.info("👀 Watchers registered for YAML configs")
 
     async def start_watchers(self):
         """Start semua watcher async."""
