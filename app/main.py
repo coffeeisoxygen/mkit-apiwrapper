@@ -1,11 +1,11 @@
 import uvicorn
 from fastapi import FastAPI
 
+from app.api import register_routers
 from app.config import version
 from app.config.cfg_cors import init_cors
 from app.config.cfg_exception import init_exceptions
 from app.config.cfg_lifespan import app_lifespan
-from app.config.cfg_router import register_routers
 
 app: FastAPI = FastAPI(
     title="mkit-apiwrapper",
