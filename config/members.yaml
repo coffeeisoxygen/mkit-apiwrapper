@@ -10,7 +10,7 @@ members:
     is_active: true
     allow_nosign: false
 
-  - memberid: OTOTEST
+  - memberid: OTOTEST1
     name: otomax utama untuk testing dengan sign
     pin: 777999
     password: secret123
