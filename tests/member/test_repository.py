@@ -1,4 +1,5 @@
 import pytest
+from app.custom.exc_exceptions import RepositoryExcpError
 from app.domain.member.rep_member import MemberRepository
 from app.domain.member.sch_member import MemberInDB
 
@@ -46,41 +47,66 @@ def make_member_from_dict(data):
 
 
 @pytest.mark.usefixtures("valid_members_data")
-def test_load_and_get_member(valid_members_data):
+def test_add_and_get_member(valid_members_data):
     repo = MemberRepository()
+    repo.clear()
     member = make_member_from_dict(valid_members_data[0])
-    repo.load([member])
+    repo.add(member.memberid, member)
     assert repo.get(member.memberid) == member
 
 
 @pytest.mark.usefixtures("valid_members_data")
-def test_all_returns_all_members(valid_members_data):
+def test_add_bulk_and_get_all(valid_members_data):
     repo = MemberRepository()
+    repo.clear()
     members = [make_member_from_dict(m) for m in valid_members_data]
-    repo.load(members)
-    assert set(repo.all()) == set(members)
+    repo.add_bulk({m.memberid: m for m in members})
+    assert set(repo.get_all()) == set(members)
 
 
 @pytest.mark.usefixtures("valid_members_data")
 def test_count_returns_number_of_members(valid_members_data):
     repo = MemberRepository()
+    repo.clear()
     members = [make_member_from_dict(m) for m in valid_members_data]
-    repo.load(members)
+    repo.add_bulk({m.memberid: m for m in members})
     assert repo.count() == len(members)
 
 
 @pytest.mark.usefixtures("valid_members_data")
 def test_exists_checks_member_existence(valid_members_data):
     repo = MemberRepository()
+    repo.clear()
     member = make_member_from_dict(valid_members_data[0])
-    repo.load([member])
+    repo.add(member.memberid, member)
     assert repo.exists(member.memberid)
     assert not repo.exists("missingid")
 
 
 def test_clear_removes_all_members():
     repo = MemberRepository()
-    repo.load([make_member("otomax1"), make_member("OTOTEST")])
+    repo.clear()
+    repo.add_bulk({
+        m.memberid: m for m in [make_member("otomax1"), make_member("OTOTEST")]
+    })
     repo.clear()
     assert repo.count() == 0
-    assert repo.all() == []
+    assert repo.get_all() == []
+
+
+def test_delete_member():
+    repo = MemberRepository()
+    repo.clear()
+    member = make_member("otomax1")
+    repo.add(member.memberid, member)
+    repo.delete(member.memberid)
+    assert not repo.exists(member.memberid)
+
+
+def test_add_duplicate_key_raises():
+    repo = MemberRepository()
+    repo.clear()
+    member = make_member("otomax1")
+    repo.add(member.memberid, member)
+    with pytest.raises(RepositoryExcpError):
+        repo.add(member.memberid, member)
