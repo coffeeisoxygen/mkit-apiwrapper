@@ -35,9 +35,8 @@ class AppOrchestrator:
         )
         self.watcher: AsyncFileWatcher = AsyncFileWatcher()
 
-    async def init_services(self):
-        """Clear repos & seed initial data async (fail-safe)."""
-        # Step 1: Clear repos
+    async def seed_initial_data(self):
+        """Seeder: clear repos & seed initial data. Hanya dipanggil saat aplikasi start."""
         try:
             self.member_repo.clear()
             self.module_repo.clear()
@@ -46,7 +45,6 @@ class AppOrchestrator:
             self.logger.exception("❌ Failed to clear repos")
             raise RuntimeError(f"Failed to clear repos: {e}") from e
 
-        # Step 2: Seed data awal (fail-safe)
         try:
             await self.member_uploader.upload_from_yaml(PATHMEMBER)
             await self.module_uploader.upload_from_yaml(PATHMODULE)
@@ -56,7 +54,7 @@ class AppOrchestrator:
             # tetap lanjut meskipun ada error
 
     def setup_watchers(self):
-        """Register watcher untuk auto reload setiap YAML perubahan."""
+        """Watcher: hanya reload data ke repo saat file berubah, tidak clear atau seed ulang."""
 
         async def reload_members():
             try:
