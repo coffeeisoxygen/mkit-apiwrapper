@@ -1,6 +1,7 @@
-from app.core.datalayer import BaseDataManager, BaseRepository
+from app.core.datalayer import BaseDataManager, BaseRepository, BaseService
 
 __all__ = [
     "BaseDataManager",
     "BaseRepository",
+    "BaseService",
 ]

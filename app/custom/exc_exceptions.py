@@ -69,3 +69,10 @@ class RepositoryExcpError(AppExceptionError):
 
     default_message: str = "Ada Error Di Proses Repository"
     status_code: int = 500
+
+
+class ServiceExcpError(AppExceptionError):
+    """Exception raised for service errors."""
+
+    default_message: str = "Ada Error Di Proses Service"
+    status_code: int = 500
