@@ -1,3 +1,18 @@
-
 Todo:
   ☐ Integrate Database and Nice GUI Later , Kalau Core Logic dan Kebutuhan Aplikasi Sudah Selesai ya
+
+  ☐  Refactor Plan (biar scalable & siap nyambung ke trxprocessor):
+    ☐  Base Loader Abstraction
+      ☐ Bikin BaseDataImporter → tanggung jawab: file exists, parse, validate duplicates, validate schema.
+      ☐ YAMLDataImporter → extend BaseDataImporter (jadi spesifik format YAML)
+        ☐ Kalau nanti ada JSONDataImporter / DBDataImporter tinggal extend juga.
+
+    ☐  Repository (opsional, tergantung scope)
+      ☐ Base Repository
+        ☐ Karena repo mirip-mirip (dict based, ada load/get/all/count/exists/clear), bisa bikin BaseRepository[T].
+        ☐ MemberRepository tinggal inherit & kasih typing T=MemberInDB.
+        ☐ Keuntungan: DRY + konsisten untuk semua domain (Member, Module, Product, dsb).
+
+    ☐  Service
+      ☐ Jangan tight coupling ke YAML langsung.
+      ☐ Service cukup tahu: “gue punya repo + loader”.
