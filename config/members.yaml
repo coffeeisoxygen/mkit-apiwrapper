@@ -1,7 +1,7 @@
 # Data Member Sample, Pastikan data yg di input sesuai dengan credentials
 
 members:
-  - memberid: OTOTEST
+  - memberid: OTOTEST1
     name: otomax utama untuk testing dengan sign
     pin: 777999
     password: secret123
@@ -10,7 +10,7 @@ members:
     is_active: true
     allow_nosign: false
 
-  - memberid: OTOTEST
+  - memberid: OTOTEST2
     name: otomax utama untuk testing dengan sign
     pin: 777999
     password: secret123
