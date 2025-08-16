@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Any, TypeVar
 
 import yaml
-import yaml.error
 from app.custom.exc_exceptions import FileLoaderExcpError
 from pydantic import BaseModel, ValidationError
 
@@ -19,7 +18,7 @@ class YAMLDataImporter[T: BaseModel]:
         try:
             with yaml_path.open("r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
-        except yaml.error as e:
+        except yaml.YAMLError as e:
             self.logger.error(f"Failed to parse YAML file: {e}")
             raise FileLoaderExcpError(f"Failed to parse YAML file: {e}") from e
         return data

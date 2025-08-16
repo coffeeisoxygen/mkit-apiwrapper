@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Any
 
-from app.custom.exc_exceptions import InternalServiceError
 from app.domain.member.sch_member import MemberInDB
 from app.utils.loader.yaml_loader import YAMLDataImporter
 
@@ -21,15 +20,17 @@ class MemberService:
         )
 
     def load_members(self) -> None:
-        """Load dan validasi data member dari YAML ke memory."""
-        try:
-            self._members = self.loader.load_and_validate(self.yaml_path)
-            self.logger.info(
-                f"✅ Loaded {len(self._members)} members from {self.yaml_path}"
-            )
-        except Exception as e:
-            self.logger.error(f"❌ Failed to load members: {e}")
-            raise InternalServiceError(f"Failed to load members: {e}") from e
+        with self.logger.contextualize(
+            member_count=len(self._members), path=str(self.yaml_path)
+        ):
+            try:
+                self._members = self.loader.load_and_validate(self.yaml_path)
+                self.logger.info(
+                    f"✅ Loaded {len(self._members)} members from {self.yaml_path}"
+                )
+            except Exception as e:
+                self.logger.error(f"❌ Failed to load members: {e}")
+                self.logger.info("Using previous member data in memory.")
 
     def get_all(self) -> list[MemberInDB]:
         return self._members
