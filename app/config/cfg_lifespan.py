@@ -12,7 +12,7 @@ async def app_lifespan(app):  # noqa: ANN001, D103
 
     # 2. Init orchestrator & services
     orchestrator = AppOrchestrator()
-    orchestrator.init_services()
+    await orchestrator.init_services()
     orchestrator.setup_watchers()
     await orchestrator.start_watchers()
     # 3. Simpan orchestrator di state

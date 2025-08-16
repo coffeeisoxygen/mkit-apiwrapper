@@ -1,5 +1,6 @@
 """ini base untuk seeding data awal aja."""
 
+import inspect
 from typing import Any
 
 from app.custom.exc_exceptions import ServiceExcpError, UploaderExcpError
@@ -15,16 +16,16 @@ class BaseUploader:
         self._service = service
         self._log = logger.bind(uploader=self.uploader_name)
 
-    def upload(self, data: dict[str, Any]) -> None:
-        """Upload data dict ke service.
-
-        Args:
-            data (dict[str, Any]): key-value data yang akan diupload.
-        """
+    async def upload(self, data: dict[str, Any]) -> None:
         log = self._log.bind(operation="upload")
         try:
             for key, entity in data.items():
-                self._service.add(key, entity)
+                add_method = getattr(self._service, "add", None)
+                if add_method is not None and callable(add_method):
+                    if inspect.iscoroutinefunction(add_method):
+                        await add_method(key, entity)
+                    else:
+                        add_method(key, entity)
             log.info(f"Total {len(data)} entity berhasil diupload")
         except ServiceExcpError:
             log.exception("Service gagal saat upload")

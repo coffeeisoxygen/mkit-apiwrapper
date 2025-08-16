@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import aiofiles
 import yaml
 
 from app.core.datalayer import BaseUploader
@@ -15,13 +16,15 @@ class MemberUploader(BaseUploader):
     def __init__(self, service: MemberService):
         super().__init__(service)
 
-    def upload_from_yaml(self, path: str | Path):
+    async def upload_from_yaml(self, path: str | Path):
         log = logger.bind(
             uploader=self.uploader_name, operation="upload_from_yaml", path=str(path)
         )
         try:
             p = Path(path)
-            raw = yaml.safe_load(p.read_text(encoding="utf-8"))
+            async with aiofiles.open(p, encoding="utf-8") as f:
+                content = await f.read()
+            raw = yaml.safe_load(content)
 
             if not isinstance(raw, dict):
                 log.error("YAML format invalid, harus dict")
@@ -33,7 +36,7 @@ class MemberUploader(BaseUploader):
                 key = item["memberid"]
                 data_models[key] = MemberInDB(**item)
 
-            self.upload(data_models)
+            await self.upload(data_models)
             log.info(f"Total {len(data_models)} member berhasil diupload")
 
         except Exception as e:

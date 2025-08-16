@@ -21,16 +21,16 @@ class AppOrchestrator:
         self.module_service: ModuleService = ModuleService()
         self.watcher: AsyncFileWatcher = AsyncFileWatcher()
 
-    def init_services(self):
-        """Clear repos & seed initial data."""
+    async def init_services(self):
+        """Clear repos & seed initial data async."""
         try:
             self.member_service._repo.clear()
             self.module_service._repo.clear()
             self.logger.info("✅ Repos cleared")
 
-            # Initial seeding
-            MemberUploader(self.member_service).upload_from_yaml(PATHMEMBER)
-            ModuleUploader(self.module_service).upload_from_yaml(PATHMODULE)
+            # Initial seeding async
+            await MemberUploader(self.member_service).upload_from_yaml(PATHMEMBER)
+            await ModuleUploader(self.module_service).upload_from_yaml(PATHMODULE)
             self.logger.info("✅ Initial data seeded for Member & Module")
         except Exception as e:
             self.logger.exception("❌ Failed to initialize services")
@@ -39,18 +39,15 @@ class AppOrchestrator:
     def setup_watchers(self):
         """Register watcher untuk auto reload setiap YAML perubahan."""
         try:
-            self.watcher.add_watch(
-                PATHMEMBER,
-                lambda: MemberUploader(self.member_service).upload_from_yaml(
-                    PATHMEMBER
-                ),
-            )
-            self.watcher.add_watch(
-                PATHMODULE,
-                lambda: ModuleUploader(self.module_service).upload_from_yaml(
-                    PATHMODULE
-                ),
-            )
+
+            async def reload_members():
+                await MemberUploader(self.member_service).upload_from_yaml(PATHMEMBER)
+
+            async def reload_modules():
+                await ModuleUploader(self.module_service).upload_from_yaml(PATHMODULE)
+
+            self.watcher.add_watch(PATHMEMBER, reload_members)
+            self.watcher.add_watch(PATHMODULE, reload_modules)
             self.logger.info("👀 Watchers registered for YAML configs")
         except Exception as e:
             self.logger.exception("❌ Failed to setup watchers")
