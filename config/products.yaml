@@ -1,0 +1,80 @@
+products:
+  # ======================================================#
+  #                           Paket Data                  #
+  # ======================================================#
+  - product: DATA
+    provider: digipos
+    name: Check Eligible Paket Digipos
+    type: paketdata
+
+    payment_method: LINKAJA
+
+  - product: VOICE_SMS
+    provider: digipos
+    name: Check Eligible Paket SMS
+    type: paketdata
+    payment_method: LINKAJA
+
+  - product: DIGITAL_OTHER
+    provider: digipos
+    name: Check Eligible Paket Digital Other
+    type: paketdata
+    payment_method: LINKAJA
+
+  - product: DIGITAL_MUSIC
+    provider: digipos
+    name: Check Eligible Paket Digital Music
+    type: paketdata
+    payment_method: LINKAJA
+
+  - product: DIGITAL_GAME
+    provider: digipos
+    name: Check Eligible Paket Digital Game
+    type: paketdata
+    payment_method: LINKAJA
+
+  - product: ROAMING
+    provider: digipos
+    name: Check Eligible Paket Roaming
+    type: paketdata
+    payment_method: LINKAJA
+
+  - product: BYU
+    provider: digipos
+    name: Check Eligible Paket BYU
+    type: paketdata
+    payment_method: LINKAJA
+
+  - product: HVC_DATA
+    provider: digipos
+    name: Check Eligible Paket HVC Data
+    type: paketdata
+    payment_method: LINKAJA
+
+  - product: HVC_VOICE_SMS
+    provider: digipos
+    name: Check Eligible Paket HVC Voice SMS
+    type: paketdata
+    payment_method: LINKAJA
+  # ======================================================#
+  #                           Pulsa Only                  #
+  # ======================================================#
+  - product: FIX
+    provider: digipos
+    name: Pulsa Tipe FIX
+    type: pulsa
+    payment_method: NGRS
+
+  - product: BULK
+    provider: digipos
+    name: Pulsa Tipe BULK
+    type: pulsa
+    payment_method: LINKAJA
+  # ======================================================#
+  #                           Voucher Only                #
+  # ======================================================#
+  - product: VF
+    provider: digipos
+    name: Check Eligible Paket VF
+    type: voucher
+    payment_method: NGRS
