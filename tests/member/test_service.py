@@ -1,57 +1,87 @@
-from pathlib import Path
+"""
+Unit tests for MemberService in app.domain.member.srv_member.
+
+These tests cover member addition, bulk addition, existence checks, clearing,
+duplicate key handling, and member deletion for the MemberService class.
+"""
+
+# pyright: reportUndefinedVariable=false, reportGeneralTypeIssues=false, reportArgumentType=false
 
 import pytest
+from app.custom.exc_exceptions import ServiceExcpError
 from app.domain.member.sch_member import MemberInDB
 from app.domain.member.srv_member import MemberService
 
 
-class DummyLogger:
-    def __init__(self):
-        self.messages = []
-
-    def info(self, msg):
-        self.messages.append(msg)
-
-    def error(self, msg):
-        self.messages.append(msg)
-
-
-@pytest.fixture
-def dummy_logger():
-    return DummyLogger()
-
-
-@pytest.fixture
-def valid_yaml_path():
-    return Path("tests/data/members_valid.yaml")
-
-
-def test_load_members_success(valid_yaml_path, dummy_logger):
-    service = MemberService(valid_yaml_path, dummy_logger)
-    service.load_members()
-    members = service.get_all()
-    assert len(members) == 2
-    assert isinstance(members[0], MemberInDB)
-    assert members[0].memberid == "otomax1"
-    assert members[1].memberid == "OTOTEST"
+def make_member(
+    memberid="otomax1",
+    name="Test",
+    pin="123456",
+    password="password",
+    ipaddress="192.168.1.1",
+    report_url="http://localhost/report",
+    is_active=True,
+    allow_nosign=False,
+):
+    return MemberInDB(
+        memberid=memberid,
+        name=name,
+        pin=pin,
+        password=password,
+        ipaddress=ipaddress,
+        report_url=report_url,
+        is_active=is_active,
+        allow_nosign=allow_nosign,
+    )
 
 
-def test_get_by_id(valid_yaml_path, dummy_logger):
-    service = MemberService(valid_yaml_path, dummy_logger)
-    service.load_members()
-    member = service.get_by_id("otomax1")
-    assert member is not None
-    assert member.name == "otomax utama untuk testing dengan sign"
+def test_add_and_get_member():
+    service = MemberService()
+    service._repo.clear()
+    member = make_member("otomax1")
+    service.add("otomax1", member)
+    assert service.get("otomax1") == member
 
 
-def test_is_active(valid_yaml_path, dummy_logger):
-    service = MemberService(valid_yaml_path, dummy_logger)
-    service.load_members()
-    assert service.is_active("otomax1") is True
-    assert service.is_active("OTOTEST") is True
+def test_add_bulk_and_count():
+    service = MemberService()
+    service._repo.clear()
+    members = [make_member("otomax1"), make_member("OTOTEST")]
+    service.add_bulk({m.memberid: m for m in members})
+    assert service.count() == 2
 
 
-def test_missing_file(dummy_logger):
-    service = MemberService(Path("tests/data/notfound.yaml"), dummy_logger)
-    with pytest.raises(Exception):  # noqa: B017
-        service.load_members()
+def test_exists():
+    service = MemberService()
+    service._repo.clear()
+    member = make_member("otomax1")
+    service.add("otomax1", member)
+    assert service.exists("otomax1") is True
+    assert service.exists("missingid") is False
+
+
+def test_clear():
+    service = MemberService()
+    service._repo.clear()
+    members = [make_member("otomax1"), make_member("OTOTEST")]
+    service.add_bulk({m.memberid: m for m in members})
+    service._repo.clear()
+    assert service.count() == 0
+
+
+def test_add_duplicate_key_raises():
+    service = MemberService()
+    service._repo.clear()
+    member = make_member("otomax1")
+    service.add("otomax1", member)
+    with pytest.raises(ServiceExcpError):
+        service.add("otomax1", member)
+
+
+def test_delete_member():
+    service = MemberService()
+    service._repo.clear()
+    member = make_member("otomax1")
+    service.add("otomax1", member)
+    service.delete("otomax1")
+    assert service.exists("otomax1") is False
