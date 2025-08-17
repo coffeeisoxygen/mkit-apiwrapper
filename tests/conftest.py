@@ -4,6 +4,7 @@ import app.database.session as db_session
 import pytest
 import yaml
 from app.config import get_settings
+from app.database.table import create_tables
 from app.mlogg import logger
 from app.models import Base
 from dotenv import load_dotenv
@@ -48,16 +49,15 @@ def intercept_loguru(caplog):
 async def setup_test_db():
     """Buat semua table sebelum test dijalankan."""
     # pastikan engine siap
-    async with db_session.sessionmanager.engine.begin() as conn:
-        await conn.run_sync(
-            lambda sync_conn: Base.metadata.create_all(sync_conn, checkfirst=True)
-        )
-
+    # Gunakan helper create_tables agar konsisten
+    await create_tables()
+    print("Test DB tables created")
     yield  # semua test jalan di sini
 
     # optional: drop tables setelah test selesai
-    async with db_session.sessionmanager.engine.begin() as conn:
-        await conn.run_sync(lambda sync_conn: Base.metadata.drop_all(sync_conn))
+    if db_session.sessionmanager.engine is not None:
+        async with db_session.sessionmanager.engine.begin() as conn:
+            await conn.run_sync(lambda sync_conn: Base.metadata.drop_all(sync_conn))
 
 
 # fixture file untuk test
