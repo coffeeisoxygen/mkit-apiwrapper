@@ -2,18 +2,17 @@
 
 from sqlalchemy import inspect
 
-from app.database.session import sessionmanager
 from app.mlogg import logger
 from app.models import Base
 
 
 # Create tables helper
-async def create_tables():
+async def create_tables(engine):
     """Create all database tables.
 
     This function creates all tables defined in the SQLAlchemy models.
     """
-    async with sessionmanager.engine.begin() as conn:  # type: ignore
+    async with engine.begin() as conn:
         await conn.run_sync(
             lambda sync_conn: Base.metadata.create_all(sync_conn, checkfirst=True)
         )

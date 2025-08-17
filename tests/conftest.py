@@ -1,3 +1,14 @@
+import pytest
+
+
+# --- SessionManager Fixture ---
+@pytest.fixture(scope="session")
+def test_sessionmanager():
+    from app.database.session import sessionmanager
+
+    return sessionmanager
+
+
 from pathlib import Path
 import pytest
 import yaml
@@ -21,9 +32,20 @@ def setup_test_env():
     load_dotenv(dotenv_path=PATHTOTESTENV, override=True)
     get_settings.cache_clear()
     settings = get_settings()
+    import os
+
+    logger.info(f"[conftest] DB path: {settings.db_path}")
+    logger.info(f"[conftest] CWD: {os.getcwd()}")
     assert settings.app_env == "TESTING"
     # re-init DB engine pakai test DB
     db_session.sessionmanager = db_session.DatabaseSessionManager(settings.db_path)
+    logger.info(f"Engine id after re-init: {id(db_session.sessionmanager.engine)}")
+    # Panggil create_tables setelah engine di-reinit
+    import asyncio
+
+    asyncio.get_event_loop().run_until_complete(
+        create_tables(db_session.sessionmanager.engine)
+    )
 
 
 # --- Logging ---
@@ -31,7 +53,7 @@ def setup_test_env():
 def intercept_loguru(caplog):
     handler_id = logger.add(
         sink=caplog.handler,
-        level="DEBUG",
+        level="INFO",
         format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
         "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
         "<level>{message}</level>",
@@ -44,7 +66,6 @@ def intercept_loguru(caplog):
 # --- Database tables ---
 @pytest.fixture(scope="session", autouse=True)
 async def setup_test_db():
-    await create_tables()
     yield
     if db_session.sessionmanager.engine is not None:
         async with db_session.sessionmanager.engine.begin() as conn:
