@@ -1,9 +1,11 @@
 from pathlib import Path
 
+import app.database.session as db_session
 import pytest
 import yaml
 from app.config import get_settings
 from app.mlogg import logger
+from app.models import Base
 from dotenv import load_dotenv
 
 PATHTOTESTENV = Path(__file__).parent.parent / ".env.test"
@@ -24,6 +26,9 @@ def setup_test_env():
 
     print(f"Test env loaded app_env={settings.app_env}")
 
+    # Re-init sessionmanager agar engine pakai path dari .env.test
+    db_session.sessionmanager = db_session.DatabaseSessionManager(settings.db_path)
+
 
 @pytest.fixture(autouse=True)
 def intercept_loguru(caplog):
@@ -37,6 +42,22 @@ def intercept_loguru(caplog):
     )
     yield
     logger.remove(handler_id)
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def setup_test_db():
+    """Buat semua table sebelum test dijalankan."""
+    # pastikan engine siap
+    async with db_session.sessionmanager.engine.begin() as conn:
+        await conn.run_sync(
+            lambda sync_conn: Base.metadata.create_all(sync_conn, checkfirst=True)
+        )
+
+    yield  # semua test jalan di sini
+
+    # optional: drop tables setelah test selesai
+    async with db_session.sessionmanager.engine.begin() as conn:
+        await conn.run_sync(lambda sync_conn: Base.metadata.drop_all(sync_conn))
 
 
 # fixture file untuk test

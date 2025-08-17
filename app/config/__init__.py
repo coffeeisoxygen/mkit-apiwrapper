@@ -24,11 +24,6 @@ class EnvironmentEnums(StrEnum):
     TESTING = "TESTING"
 
 
-class ProviderEnums(StrEnum):
-    DIGIPOS = "DIGIPOS"
-    ISIMPLE = "ISIMPLE"
-
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=DEFAULT_ENV_FILE,
@@ -41,7 +36,7 @@ class Settings(BaseSettings):
     app_debug: bool = False
     app_name: str = "MKIT_WRAPPER"
     app_version: str = version
-    db_path: str
+    db_path: str = "sqlite+aiosqlite:///./application.db"
     config_path: str
 
 
