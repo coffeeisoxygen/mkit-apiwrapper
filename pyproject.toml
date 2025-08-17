@@ -107,6 +107,7 @@ convention = "google"
 "tests/*" = ["D", "ANN","T201"]
 "scripts/*" = ["D100"]
 "__init__.py" = ["ALL"]
+"conftest.py" = ["ALL"]
 "_version.py" = ["D", "ANN", "E", "W", "F", "I", "UP", "B"]
 "alembic/*.py" = ["ALL"]
 
