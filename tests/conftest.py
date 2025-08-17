@@ -9,7 +9,7 @@ from app.database.table import create_tables
 from app.models import Base
 from app.models.member import Member
 
-from app.mlogg import logger
+from loguru import logger
 from app.config import get_settings
 
 PATHTOTESTENV = Path(__file__).parent.parent / ".env.test"

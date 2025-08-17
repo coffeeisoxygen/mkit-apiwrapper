@@ -3,8 +3,8 @@
 from sqlalchemy import inspect
 
 from app.database.session import sessionmanager
+from app.mlogg import logger
 from app.models import Base
-from mlogg import logger
 
 
 # Create tables helper
@@ -20,4 +20,4 @@ async def create_tables():
         tables = await conn.run_sync(
             lambda sync_conn: inspect(sync_conn).get_table_names()
         )
-        logger.info("Tables after create_tables: %s", tables)
+        logger.info(f"Tables after create_tables: {tables}")
