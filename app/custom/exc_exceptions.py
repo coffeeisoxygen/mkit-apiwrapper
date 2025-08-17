@@ -54,3 +54,17 @@ class ConfigExcpError(AppExceptionError):
 
     default_message: str = "Ada Error Di Proses Config"
     status_code = 500
+
+
+class BusinessLogicError(AppExceptionError):
+    """Exception raised for business logic errors."""
+
+    default_message: str = "Ada Error Di Proses Logika Bisnis"
+    status_code: int = 400
+
+
+class EntityDoesNotExistError(AppExceptionError):
+    """Exception raised when an entity does not exist."""
+
+    default_message: str = "Entity does not exist."
+    status_code: int = 404
