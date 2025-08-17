@@ -2,12 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    SecretStr,
-)
+from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, IPvAnyAddress, SecretStr
 
 
 class MemberBase(BaseModel):
@@ -16,7 +11,6 @@ class MemberBase(BaseModel):
         extra="forbid",
         from_attributes=True,
     )
-    """Schema dasar untuk member."""
 
     memberid: str = Field(
         ..., description="ID unik untuk member", min_length=5, pattern=r"^[a-zA-Z0-9]*$"
@@ -24,12 +18,15 @@ class MemberBase(BaseModel):
     name: str = Field(
         ..., description="Nama member", min_length=2, pattern=r"^[\w\s\-\.]{1,100}$"
     )
-    ipaddress: str = Field(..., description="Alamat IP member")
-    report_url: str = Field(..., description="URL untuk laporan member")
+    ipaddress: IPvAnyAddress = Field(..., description="Alamat IP member")
+    report_url: AnyHttpUrl = Field(..., description="URL untuk laporan member")
 
 
 class MemberCreate(MemberBase):
-    """Schema untuk membuat member baru."""
+    """Schema untuk membuat member baru (plaintext pin/password, di-hash oleh service)."""
+
+    pin: SecretStr = Field(..., description="PIN untuk member", min_length=6)
+    password: SecretStr = Field(..., description="Password untuk member", min_length=6)
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -41,15 +38,10 @@ class MemberCreate(MemberBase):
                 "name": "John Doe",
                 "ipaddress": "192.168.1.1",
                 "report_url": "http://example.com/report",
-                "hash_pin": "hashed_pin",
-                "hash_password": "hashed_password",
+                "pin": "123456",
+                "password": "secret123",
             }
         },
-    )
-
-    hash_pin: SecretStr = Field(..., description="PIN untuk member", min_length=6)
-    hash_password: SecretStr = Field(
-        ..., description="Password untuk member", min_length=6
     )
 
 
@@ -61,6 +53,8 @@ class MemberRead(MemberBase):
     created_at: datetime = Field(description="Waktu pembuatan member")
     updated_at: datetime = Field(description="Waktu pembaruan member")
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class MemberUpdate(BaseModel):
     """schema untuk update data member."""
@@ -68,17 +62,18 @@ class MemberUpdate(BaseModel):
     name: str | None = Field(
         None, description="Nama member", min_length=2, pattern=r"^[\w\s\-\.]{1,100}$"
     )
-    ipaddress: str | None = Field(None, description="Alamat IP member")
-    report_url: str | None = Field(None, description="URL untuk laporan member")
+    ipaddress: IPvAnyAddress | None = Field(None, description="Alamat IP member")
+    report_url: AnyHttpUrl | None = Field(None, description="URL untuk laporan member")
     is_active: bool | None = Field(None, description="Status keaktifan member")
     allow_nosign: bool | None = Field(
         None,
         description="member akan bertransaksi tanpa otomax sign jika di set true",
     )
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", from_attributes=True)
 
 
 class MemberDelete(BaseModel):
+    """Schema untuk menghapus member (hard delete)."""
+
     memberid: str = Field(..., description="ID unik untuk member")
-    is_active: bool = Field(..., description="Status keaktifan member")

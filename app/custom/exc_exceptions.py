@@ -68,3 +68,10 @@ class EntityDoesNotExistError(AppExceptionError):
 
     default_message: str = "Entity does not exist."
     status_code: int = 404
+
+
+class EntityAlreadyExistsError(AppExceptionError):
+    """Exception raised when an entity already exists."""
+
+    default_message: str = "Entity already exists."
+    status_code: int = 409

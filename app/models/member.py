@@ -1,9 +1,7 @@
 """Model Untuk Member / Concumer API / Otomax dan lain lain."""
 
-import datetime
-
-from sqlalchemy import Boolean, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, DateTime, String, func
+from sqlalchemy.orm import mapped_column
 
 from app.models import Base
 
@@ -11,20 +9,22 @@ from app.models import Base
 class Member(Base):
     __tablename__ = "members"
 
-    memberid: Mapped[str] = mapped_column(String(), primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String())
-    ipaddress: Mapped[str] = mapped_column(String())
-    report_url: Mapped[str] = mapped_column(String())
-    hash_pin: Mapped[str] = mapped_column(String())
-    hash_password: Mapped[str] = mapped_column(String())
-    is_active: Mapped[bool] = mapped_column(Boolean(), default=True)
-    allow_nosign: Mapped[bool] = mapped_column(Boolean(), default=False)
-    created_at: Mapped[datetime.datetime] = mapped_column(
-        default=lambda: datetime.datetime.now(datetime.UTC)
+    memberid = mapped_column(String(32), primary_key=True, index=True, nullable=False)
+    name = mapped_column(String(100), nullable=False)
+    ipaddress = mapped_column(String(45), nullable=False)  # cukup utk IPv4/IPv6 teks
+    report_url = mapped_column(String(2048), nullable=False)  # URL panjang
+    hash_pin = mapped_column(String(255), nullable=False)
+    hash_password = mapped_column(String(255), nullable=False)
+    is_active = mapped_column(Boolean(), default=True, nullable=False)
+    allow_nosign = mapped_column(Boolean(), default=False, nullable=False)
+    created_at = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    updated_at: Mapped[datetime.datetime] = mapped_column(
-        default=lambda: datetime.datetime.now(datetime.UTC),
-        onupdate=lambda: datetime.datetime.now(datetime.UTC),
+    updated_at = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
     )
 
     def __repr__(self) -> str:
